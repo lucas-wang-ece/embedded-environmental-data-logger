@@ -19,6 +19,17 @@
 - `Serial.println()` prints and then moves to a new line.
 - Serial output is useful for debugging firmware runtime behavior.
 
+## V3: DHT11 Sensor Reading
+
+### Concepts
+- The DHT11 sensor measures temperature and humidity.
+- The sensor has three pins: power, data output, and ground.
+- The data output pin is connected to Arduino digital pin 2.
+- `dht.begin()` initializes the DHT11 sensor.
+- `dht.readTemperature()` reads the temperature in Celsius.
+- `dht.readHumidity()` reads the humidity percentage.
+- `isnan()` is used to check whether the sensor reading failed.
+
 ## Development Environment
 
 ### Concepts
