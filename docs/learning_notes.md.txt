@@ -40,6 +40,17 @@
 - `digitalWrite(ALERT_LED_PIN, LOW)` turns the alert LED off.
 - This version connects sensor input, decision-making logic, and hardware output.
 
+## V5: Timer-Driven Sampling
+
+### Concepts
+- `delay()` blocks the main program while waiting.
+- Timer-driven sampling allows the system to request sensor readings at fixed time intervals.
+- A timer interrupt should stay short and should not perform slow operations.
+- The interrupt service routine only sets a `sampleRequested` flag.
+- The main `loop()` checks the flag and performs the actual sensor reading.
+- `volatile` is used for variables shared between the interrupt service routine and the main loop.
+- This structure makes the firmware more responsive and easier to extend.
+
 ## Development Environment
 
 ### Concepts
