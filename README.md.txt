@@ -9,7 +9,7 @@ The system will collect environmental sensor readings, output diagnostic logs th
 ## Development Progress
 
 - [x] V1: Microcontroller bring-up and built-in LED blink
-- [ ] V2: Serial monitor output
+- [x] V2: Serial monitor output
 - [ ] V3: Temperature/humidity sensor reading
 - [ ] V4: Threshold-based LED/buzzer alert
 - [ ] V5: Timer-driven sampling
@@ -29,3 +29,6 @@ The system will collect environmental sensor readings, output diagnostic logs th
 ## Current Status
 
 V1 has been completed. The Arduino-compatible board was successfully configured in Arduino IDE, and the built-in LED blink firmware was uploaded to verify the development environment.
+
+
+V2 has been completed. The Arduino-compatible board was successfully configured in Arduino IDE, the built-in LED blink firmware was uploaded, and Serial Monitor output was verified at 9600 baud for basic UART-style debugging.
