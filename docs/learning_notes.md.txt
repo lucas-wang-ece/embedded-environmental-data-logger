@@ -30,6 +30,16 @@
 - `dht.readHumidity()` reads the humidity percentage.
 - `isnan()` is used to check whether the sensor reading failed.
 
+## V4: Threshold-Based Alert
+
+### Concepts
+- Sensor readings can be used as inputs for control logic.
+- A temperature threshold is defined using `TEMPERATURE_THRESHOLD_C`.
+- `if / else` logic determines whether the alert should be on or off.
+- `digitalWrite(ALERT_LED_PIN, HIGH)` turns the alert LED on.
+- `digitalWrite(ALERT_LED_PIN, LOW)` turns the alert LED off.
+- This version connects sensor input, decision-making logic, and hardware output.
+
 ## Development Environment
 
 ### Concepts

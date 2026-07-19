@@ -11,7 +11,7 @@ The system will collect environmental sensor readings, output diagnostic logs th
 - [x] V1: Microcontroller bring-up and built-in LED blink
 - [x] V2: Serial monitor output
 - [x] V3: Temperature/humidity sensor reading
-- [ ] V4: Threshold-based LED/buzzer alert
+- [x] V4: Threshold-based LED/buzzer alert
 - [ ] V5: Timer-driven sampling
 - [ ] V6: SD card CSV logging
 
@@ -35,3 +35,6 @@ V2 has been completed. The Arduino-compatible board was successfully configured 
 
 
 V3 has been completed. The Arduino-compatible board successfully reads temperature and humidity data from a DHT11 sensor connected to digital pin 2, and outputs real-time sensor readings through Serial Monitor at 9600 baud.
+
+
+V4 has been completed. The system reads real-time temperature and humidity data from a DHT11 sensor, compares the temperature against a defined threshold, and triggers a built-in LED alert when the threshold is reached. Serial Monitor output shows sensor readings and alert status at 9600 baud.
