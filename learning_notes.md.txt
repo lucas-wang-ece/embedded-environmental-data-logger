@@ -1,0 +1,27 @@
+# Learning Notes
+
+## V1: LED Blink
+
+### Concepts
+- `setup()` runs once when the board starts or resets.
+- `loop()` runs repeatedly after `setup()`.
+- `pinMode(pin, OUTPUT)` configures a pin as output.
+- `digitalWrite(pin, HIGH)` sets the pin to a high voltage level.
+- `digitalWrite(pin, LOW)` sets the pin to a low voltage level.
+- `delay(1000)` pauses the program for 1000 milliseconds.
+
+## V2: Serial Monitor Output
+
+### Concepts
+- `Serial.begin(9600)` starts serial communication at 9600 baud.
+- The Serial Monitor baud rate must match the value in `Serial.begin()`.
+- `Serial.print()` prints without moving to a new line.
+- `Serial.println()` prints and then moves to a new line.
+- Serial output is useful for debugging firmware runtime behavior.
+
+## Development Environment
+
+### Concepts
+- Compile means checking and converting the code into machine-readable instructions.
+- Upload means transferring the compiled firmware to the microcontroller.
+- COM port is the communication port used by the computer to talk to the Arduino board.
