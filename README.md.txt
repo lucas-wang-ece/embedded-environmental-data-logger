@@ -13,7 +13,7 @@ The system will collect environmental sensor readings, output diagnostic logs th
 - [x] V3: Temperature/humidity sensor reading
 - [x] V4: Threshold-based LED/buzzer alert
 - [x] V5: Timer-driven sampling
-- [ ] V6: SD card CSV logging
+- [x] V6: SD card CSV logging
 
 ## Hardware
 
@@ -41,3 +41,6 @@ V4 has been completed. The system reads real-time temperature and humidity data 
 
 
 V5 has been completed. The system uses a hardware timer interrupt to request sensor samples at fixed intervals, replacing delay-based polling. The main loop reads temperature and humidity data from the DHT11 sensor only when a timer-driven sample request flag is set, then updates the LED alert and prints readings through Serial Monitor.
+
+
+V6 has been completed. The system uses timer-driven sampling to read temperature and humidity data from a DHT11 sensor, updates a threshold-based LED alert, prints diagnostic output through Serial Monitor, and stores structured sensor readings locally on a microSD card as a CSV file using the SPI interface.

@@ -51,6 +51,33 @@
 - `volatile` is used for variables shared between the interrupt service routine and the main loop.
 - This structure makes the firmware more responsive and easier to extend.
 
+## V6: SD Card CSV Logging
+
+### Concepts
+- The microSD card module communicates with the Arduino through the SPI interface.
+- SPI uses multiple signal lines: CS, SCK, MOSI, and MISO.
+- `SD.begin(SD_CS_PIN)` initializes communication with the microSD card.
+- The CS pin is used to select the SD card module during SPI communication.
+- `SD.open()` opens or creates a file on the microSD card.
+- `FILE_WRITE` allows the Arduino to append new data to the file.
+- `logFile.print()` writes data without moving to a new line.
+- `logFile.println()` writes data and then moves to a new line.
+- `logFile.close()` saves and closes the file after writing.
+- CSV files store data in comma-separated format and can be opened later in spreadsheet software.
+- `millis()` records the elapsed time since the Arduino started running.
+- The final V6 version combines timer-driven sampling with SD card logging.
+
+### Wiring
+- SD Module CS    -> Arduino D10
+- SD Module SCK   -> Arduino D13
+- SD Module MOSI  -> Arduino D11
+- SD Module MISO  -> Arduino D12
+- SD Module VCC   -> Arduino 5V
+- SD Module GND   -> Arduino GND
+
+### Summary
+V6 added SPI-based microSD card logging to the environmental data logger. The system reads temperature and humidity data from the DHT11 sensor at timer-driven intervals, updates the LED alert based on a temperature threshold, prints diagnostic output through Serial Monitor, and saves structured sensor readings to `sensor.csv` on the microSD card.
+
 ## Development Environment
 
 ### Concepts
