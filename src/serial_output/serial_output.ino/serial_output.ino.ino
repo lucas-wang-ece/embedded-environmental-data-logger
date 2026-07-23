@@ -3,7 +3,7 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);      // Configure the built-in LED pin as an output pin.
 
-  Serial.println("Embedded Environmental Data Logger");       //Output starting message when the board is reset or connect
+  Serial.println("Embedded Environmental Data Logger");       //Output startup message when the board is reset or connect
   Serial.println("V2: Serial Monitor Output Started");
 }
 

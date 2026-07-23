@@ -5,54 +5,46 @@
 #define DHT_TYPE DHT11
 
 // Alert LED configuration
-#define ALERT_LED_PIN LED_BUILTIN
-#define TEMPERATURE_THRESHOLD_C 25.0
+#define ALERT_LED_PIN LED_BUILTIN       // Use the built-in LED as the alert indicator.
+#define TEMPERATURE_THRESHOLD_C 25.0    //define threshold temperature
 
-DHT dht(DHT_PIN, DHT_TYPE);
+DHT dht(DHT_PIN, DHT_TYPE);       // Create a DHT sensor object using the selected pin and sensor type.
 
-// This flag is set by the timer interrupt and checked in loop().
-volatile bool sampleRequested = false;
 
-// Counts 1-second timer ticks.
-// When it reaches 2, a new sensor sample is requested.
-volatile unsigned int timerTickCount = 0;
+volatile bool sampleRequested = false;    // This flag is set by the timer interrupt and checked in loop().
+
+
+volatile unsigned int timerTickCount = 0;   //increments every one second; a new sample will be requested when it reaches 2, so one sample is requested every two seconds
 
 void setupTimer1() {
-  // Disable interrupts while configuring Timer1.
-  noInterrupts();
+  noInterrupts();     // Disable all other interrupts while configuring Timer1.
 
-  // Clear Timer1 control registers.
-  TCCR1A = 0;
+  TCCR1A = 0;     // Clear Timer1 control registers.
   TCCR1B = 0;
 
-  // Reset Timer1 counter.
-  TCNT1 = 0;
+  TCNT1 = 0;     // Reset Timer1 counter.
 
   /*
-    Configure Timer1 for 1 Hz interrupt.
+    Configure Timer1 for 1 Hz interrupt.   16bits
 
     Arduino UNO clock speed: 16 MHz
     Prescaler: 1024
 
     Timer frequency = 16,000,000 / 1024 = 15625 Hz
+    Selecting other prescalers will still make the timer frequency too large
 
     To trigger once per second:
     OCR1A = 15625 - 1 = 15624
   */
   OCR1A = 15624;
 
-  // Enable CTC mode.
-  // CTC = Clear Timer on Compare Match.
-  TCCR1B |= (1 << WGM12);
+  TCCR1B |= (1 << WGM12);   // Enable Clear Timer on Compare Match mode.
 
-  // Set prescaler to 1024.
-  TCCR1B |= (1 << CS12) | (1 << CS10);
+  TCCR1B |= (1 << CS12) | (1 << CS10);    // Set prescaler to 1024.
 
-  // Enable Timer1 compare match interrupt.
-  TIMSK1 |= (1 << OCIE1A);
+  TIMSK1 |= (1 << OCIE1A);    // Enable Timer1 compare match interrupt.
 
-  // Re-enable interrupts.
-  interrupts();
+  interrupts();     // Re-enable interrupts.
 }
 
 // Timer1 interrupt service routine.
@@ -70,31 +62,29 @@ ISR(TIMER1_COMPA_vect) {
 void setup() {
   Serial.begin(9600);
 
-  pinMode(ALERT_LED_PIN, OUTPUT);
+  pinMode(ALERT_LED_PIN, OUTPUT);     //select the alert LED as the output pin
 
-  Serial.println("Embedded Environmental Data Logger");
+  Serial.println("Embedded Environmental Data Logger");       //print startup message
   Serial.println("V5: Timer-Driven Sampling Started");
 
-  dht.begin();
+  dht.begin();              //initialize the DHT11 sensor
 
-  // Start Timer1 after Serial and sensor initialization.
-  setupTimer1();
+  setupTimer1();            // Start Timer1 after Serial and sensor initialization.
 }
 
 void loop() {
-  // Only read the sensor when the timer interrupt requests a sample.
-  if (sampleRequested) {
-    // Safely clear the flag.
-    noInterrupts();
+  if (sampleRequested) {        // Only read the sensor when the timer interrupt requests a sample.
+
+    noInterrupts();             //clear the interrupt flag
     sampleRequested = false;
     interrupts();
 
     float humidity = dht.readHumidity();
     float temperatureC = dht.readTemperature();
 
-    if (isnan(humidity) || isnan(temperatureC)) {
-      Serial.println("Error: Failed to read from DHT11 sensor");
-      digitalWrite(ALERT_LED_PIN, LOW);
+    if (isnan(humidity) || isnan(temperatureC)) {         //check if both inputs are numbers
+      Serial.println("Error: Failed to read from DHT11 sensor");      //print error message
+      digitalWrite(ALERT_LED_PIN, LOW);                   //set output LED_PIN as low voltage so it will not light up
       return;
     }
 
@@ -106,12 +96,12 @@ void loop() {
     Serial.print(humidity);
     Serial.print(" %");
 
-    if (temperatureC >= TEMPERATURE_THRESHOLD_C) {
+    if (temperatureC >= TEMPERATURE_THRESHOLD_C) {         //check if surrounding temperature is higher than threshold temperature
       digitalWrite(ALERT_LED_PIN, HIGH);
-      Serial.println(" | Alert: ON");
+      Serial.println(" | Alert: ON");               //if yes, set alert to HIGH
     } else {
       digitalWrite(ALERT_LED_PIN, LOW);
-      Serial.println(" | Alert: OFF");
+      Serial.println(" | Alert: OFF");              //if no, set alert to OFF
     }
   }
 

@@ -13,7 +13,7 @@ void setup() {
 
   pinMode(ALERT_LED_PIN, OUTPUT);  //select the alert LED as the output pin
 
-  Serial.println("Embedded Environmental Data Logger");  //print start up message
+  Serial.println("Embedded Environmental Data Logger");  //print startup message
   Serial.println("V4: Threshold Alert Started");
 
   dht.begin();   //initialize the DHT11 sensor
@@ -23,9 +23,9 @@ void loop() {
   float humidity = dht.readHumidity();
   float temperatureC = dht.readTemperature();
 
-  if (isnan(humidity) || isnan(temperatureC)) {           //check if both inputs are valid
-    Serial.println("Error: Failed to read from DHT11 sensor");
-    digitalWrite(ALERT_LED_PIN, LOW);               //if any of the input is invalid, turn off the ALERT LED
+  if (isnan(humidity) || isnan(temperatureC)) {           //check if both inputs are numbers
+    Serial.println("Error: Failed to read from DHT11 sensor");    //print error message
+    digitalWrite(ALERT_LED_PIN, LOW);       //set output LED_PIN as low voltage so it will not light up
     delay(2000);
     return;
   }
@@ -40,10 +40,10 @@ void loop() {
 
   if (temperatureC >= TEMPERATURE_THRESHOLD_C) {        //check if surrounding temperature is higher than threshold temperature
     digitalWrite(ALERT_LED_PIN, HIGH);
-    Serial.println(" | Alert: ON");             //if yes, turn on the alert
+    Serial.println(" | Alert: ON");             //if yes, set alert to HIGH
   } else {
     digitalWrite(ALERT_LED_PIN, LOW);
-    Serial.println(" | Alert: OFF");            //if no, turn off the alert
+    Serial.println(" | Alert: OFF");            //if no, set alert to OFF
   }
 
   delay(2000);
