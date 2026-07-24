@@ -3,21 +3,33 @@
 ## V1: LED Blink
 
 ### Concepts
-- `setup()` runs once when the board starts or resets.
+- `setup()` runs once when the Arduino board starts or resets.
 - `loop()` runs repeatedly after `setup()`.
-- `pinMode(pin, OUTPUT)` configures a pin as output.
+- `pinMode(pin, OUTPUT)` configures a pin as an output.
 - `digitalWrite(pin, HIGH)` sets the pin to a high voltage level.
 - `digitalWrite(pin, LOW)` sets the pin to a low voltage level.
 - `delay(1000)` pauses the program for 1000 milliseconds.
+- This version verifies basic board bring-up and GPIO output behavior.
+
+### Summary
+V1 tested the Arduino-compatible UNO board by uploading a simple built-in LED blink program. This confirmed that the board, Arduino IDE, USB connection, selected board, and selected COM port were working correctly.
+
+---
 
 ## V2: Serial Monitor Output
 
 ### Concepts
-- `Serial.begin(9600)` starts serial communication at 9600 baud.
-- The Serial Monitor baud rate must match the value in `Serial.begin()`.
-- `Serial.print()` prints without moving to a new line.
-- `Serial.println()` prints and then moves to a new line.
-- Serial output is useful for debugging firmware runtime behavior.
+- `Serial.begin(9600)` starts serial communication between the Arduino and the computer at 9600 baud.
+- The Serial Monitor baud rate must match the value used in `Serial.begin()`.
+- `Serial.print()` prints data without moving to a new line.
+- `Serial.println()` prints data and then moves to a new line.
+- Serial output is useful for firmware debugging and runtime diagnostics.
+- The COM port is the communication channel between the computer and the Arduino board.
+
+### Summary
+V2 added Serial Monitor output to print runtime messages from the Arduino. This created a basic UART-style debugging interface that can be used to observe firmware behavior while the system is running.
+
+---
 
 ## V3: DHT11 Sensor Reading
 
@@ -28,9 +40,20 @@
 - `dht.begin()` initializes the DHT11 sensor.
 - `dht.readTemperature()` reads the temperature in Celsius.
 - `dht.readHumidity()` reads the humidity percentage.
-- `isnan()` is used to check whether the sensor reading failed.
+- `isnan()` checks whether a sensor reading failed.
+- If either temperature or humidity is invalid, the program prints an error message and skips that sample.
 
-## V4: Threshold-Based Alert
+### Wiring
+- DHT11 `+` -> Arduino 5V
+- DHT11 `OUT` -> Arduino D2
+- DHT11 `-` -> Arduino GND
+
+### Summary
+V3 added DHT11 temperature and humidity sensing. The Arduino reads real environmental data from the sensor and prints the measurements to Serial Monitor.
+
+---
+
+## V4: Threshold-Based GPIO Alert
 
 ### Concepts
 - Sensor readings can be used as inputs for control logic.
@@ -40,16 +63,42 @@
 - `digitalWrite(ALERT_LED_PIN, LOW)` turns the alert LED off.
 - This version connects sensor input, decision-making logic, and hardware output.
 
+### Note
+- In early versions, the built-in LED was used for alert output.
+- In later versions with SD card logging, an external LED on D7 is preferred because the Arduino UNO built-in LED shares D13 with the SPI SCK line.
+
+### Summary
+V4 added threshold-based alert logic. When the measured temperature reaches or exceeds the defined threshold, the alert LED turns on. Otherwise, the alert LED stays off.
+
+---
+
 ## V5: Timer-Driven Sampling
 
 ### Concepts
 - `delay()` blocks the main program while waiting.
-- Timer-driven sampling allows the system to request sensor readings at fixed time intervals.
-- A timer interrupt should stay short and should not perform slow operations.
-- The interrupt service routine only sets a `sampleRequested` flag.
+- Timer-driven sampling allows the system to request sensor readings at fixed time intervals without blocking the main loop.
+- Timer1 is configured in CTC mode to generate a periodic interrupt.
+- A 1024 prescaler slows the 16 MHz clock enough to generate a 1 Hz interrupt within the 16-bit Timer1 range.
+- `OCR1A = 15624` makes Timer1 trigger approximately once per second.
+- The interrupt service routine should stay short and should not perform slow operations.
+- The ISR only increments a counter and sets a `sampleRequested` flag.
 - The main `loop()` checks the flag and performs the actual sensor reading.
 - `volatile` is used for variables shared between the interrupt service routine and the main loop.
 - This structure makes the firmware more responsive and easier to extend.
+
+### Key Timer Registers
+- `TCCR1A` and `TCCR1B` are Timer1 control registers.
+- `TCNT1` stores the current Timer1 counter value.
+- `OCR1A` stores the compare match value.
+- `TIMSK1` controls Timer1 interrupt enable settings.
+
+### Key Idea
+The timer interrupt acts like an alarm clock. It does not read the sensor directly. It only tells the main loop that it is time to sample.
+
+### Summary
+V5 replaced delay-based polling with timer-driven sampling. Timer1 generates a periodic interrupt, and the main loop performs the actual DHT11 reading only when the `sampleRequested` flag is set.
+
+---
 
 ## V6: SD Card CSV Logging
 
@@ -57,7 +106,7 @@
 - The microSD card module communicates with the Arduino through the SPI interface.
 - SPI uses multiple signal lines: CS, SCK, MOSI, and MISO.
 - `SD.begin(SD_CS_PIN)` initializes communication with the microSD card.
-- The CS pin is used to select the SD card module during SPI communication.
+- The CS pin selects the SD card module during SPI communication.
 - `SD.open()` opens or creates a file on the microSD card.
 - `FILE_WRITE` allows the Arduino to append new data to the file.
 - `logFile.print()` writes data without moving to a new line.
@@ -65,22 +114,104 @@
 - `logFile.close()` saves and closes the file after writing.
 - CSV files store data in comma-separated format and can be opened later in spreadsheet software.
 - `millis()` records the elapsed time since the Arduino started running.
-- The final V6 version combines timer-driven sampling with SD card logging.
+- V6 combines timer-driven sampling with SD card logging.
 
-### Wiring
-- SD Module CS    -> Arduino D10
-- SD Module SCK   -> Arduino D13
-- SD Module MOSI  -> Arduino D11
-- SD Module MISO  -> Arduino D12
-- SD Module VCC   -> Arduino 5V
-- SD Module GND   -> Arduino GND
+### SD Card Wiring
+- SD Module CS -> Arduino D10
+- SD Module SCK -> Arduino D13
+- SD Module MOSI -> Arduino D11
+- SD Module MISO -> Arduino D12
+- SD Module VCC -> Arduino 5V
+- SD Module GND -> Arduino GND
+
+### Example CSV Format
+```csv
+time_ms,temperature_c,humidity_percent,alert_status
+2012,23.80,58.00,OFF
+4012,23.90,58.00,OFF
+```
 
 ### Summary
-V6 added SPI-based microSD card logging to the environmental data logger. The system reads temperature and humidity data from the DHT11 sensor at timer-driven intervals, updates the LED alert based on a temperature threshold, prints diagnostic output through Serial Monitor, and saves structured sensor readings to `sensor.csv` on the microSD card.
+V6 added SPI-based microSD card logging to the environmental data logger. The system reads temperature and humidity data from the DHT11 sensor at timer-driven intervals, updates a threshold-based alert, prints diagnostic output through Serial Monitor, and saves structured sensor readings to a CSV file on the microSD card.
+
+---
+
+## V7: Checksum-Based Data Integrity Logging
+
+### Concepts
+- A checksum is a simple data integrity value calculated from a line of logged data.
+- The checksum acts like a lightweight fingerprint for each CSV record.
+- If a logged line is changed, corrupted, or incomplete, recalculating the checksum may produce a different value.
+- This helps detect possible data corruption in SD card logging.
+- The checksum used in this project is calculated by adding the character values in the CSV data line.
+- The checksum is for error detection, not error correction.
+- V7 improves logging robustness by adding a checksum column to each CSV record.
+
+### Key Functions
+- `calculateChecksum(dataLine)` calculates a simple checksum for one CSV data line.
+- `logSensorData()` builds a CSV data line, calculates its checksum, and writes both the data and checksum to the microSD card.
+
+### Example CSV Format
+```csv
+time_ms,temperature_c,humidity_percent,alert_status,checksum
+2012,23.90,47.00,OFF,29
+4012,23.90,47.00,OFF,33
+```
+
+### Summary
+V7 added checksum-based data integrity support to the SD card logging system. Each sensor record is saved with an additional checksum field, making the project more robust and closer to real embedded logging systems.
+
+---
+
+## V8: Idle Sleep Mode Logging
+
+### Concepts
+- Sleep mode reduces MCU activity when there is no immediate work to do.
+- `SLEEP_MODE_IDLE` allows the CPU to sleep while Timer1 continues running.
+- Timer1 must keep running so it can wake the Arduino for the next sample.
+- `set_sleep_mode(SLEEP_MODE_IDLE)` selects idle sleep mode.
+- `sleep_enable()` enables sleep mode.
+- `sleep_mode()` puts the CPU into sleep.
+- The Timer1 interrupt wakes the CPU.
+- `sleep_disable()` disables sleep after the MCU wakes up.
+- V8 enters idle sleep mode when no sample is currently requested.
+- After Timer1 wakes the MCU, the main loop reads the sensor, updates the alert, calculates the checksum, and writes data to the microSD card.
+
+### Key Idea
+The system sleeps between samples instead of continuously running the main loop at full activity.
+
+### Summary
+V8 added low-power idle sleep behavior between timer-driven samples. The system continues to sample every two seconds, write checksum-based CSV records to the microSD card, and wake reliably using Timer1 interrupts.
+
+---
+
+## External GPIO LED Alert
+
+### Concepts
+- The external alert LED is controlled through a GPIO pin.
+- In the final version, the alert LED uses Arduino D7 instead of the built-in LED.
+- This avoids conflict with D13, which is used as the SPI SCK line for the SD card module.
+- The LED turns on when the measured temperature is greater than or equal to the threshold.
+- The LED turns off when the measured temperature is below the threshold.
+
+### Wiring
+- Arduino D7 -> resistor -> LED positive leg
+- LED negative leg -> GND
+
+---
 
 ## Development Environment
 
 ### Concepts
 - Compile means checking and converting the code into machine-readable instructions.
 - Upload means transferring the compiled firmware to the microcontroller.
-- COM port is the communication port used by the computer to talk to the Arduino board.
+- The selected board should be Arduino UNO.
+- The selected port should match the Arduino COM port.
+- The Serial Monitor baud rate should match `Serial.begin(9600)`.
+- Recompiling and uploading are required after changing code. Saving alone does not update the firmware running on the Arduino.
+
+---
+
+## Overall Project Summary
+
+This project progressively developed an embedded environmental data logger from basic microcontroller bring-up to timer-driven sensor sampling, SD card logging, checksum-based data integrity support, and idle sleep-mode operation. The final system integrates GPIO output, Serial Monitor diagnostics, DHT11 sensor input, Timer1 interrupts, SPI communication, microSD card CSV logging, checksum calculation, external LED alert control, and idle sleep behavior between samples.
