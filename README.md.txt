@@ -15,7 +15,7 @@ The system will collect environmental sensor readings, output diagnostic logs th
 - [x] V5: Timer-driven sampling
 - [x] V6: SD card CSV logging
 - [x] V7: Checksum-based data integrity logging
-- [ ] V8: Low-power sleep mode
+- [x] V8: Low-power sleep mode
 
 ## Hardware
 
@@ -49,3 +49,5 @@ V6 has been completed. The system uses timer-driven sampling to read temperature
 
 
 V7 has been completed. The system uses timer-driven sampling to read temperature and humidity data from a DHT11 sensor, updates a threshold-based GPIO alert, prints diagnostic output through Serial Monitor, and stores structured CSV sensor data locally on a microSD card. Each logged CSV record includes a checksum field to support basic data integrity verification.
+
+V8 has been completed. The system now enters idle sleep mode between timer-driven sensor samples while Timer1 remains active to wake the MCU. After each wake-up, the system reads DHT11 temperature and humidity data, updates the threshold-based GPIO alert, calculates a checksum, and logs the CSV record to the microSD card.
