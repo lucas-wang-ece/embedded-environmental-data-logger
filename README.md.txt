@@ -14,6 +14,8 @@ The system will collect environmental sensor readings, output diagnostic logs th
 - [x] V4: Threshold-based LED/buzzer alert
 - [x] V5: Timer-driven sampling
 - [x] V6: SD card CSV logging
+- [x] V7: Checksum-based data integrity logging
+- [ ] V8: Low-power sleep mode
 
 ## Hardware
 
@@ -44,3 +46,6 @@ V5 has been completed. The system uses a hardware timer interrupt to request sen
 
 
 V6 has been completed. The system uses timer-driven sampling to read temperature and humidity data from a DHT11 sensor, updates a threshold-based LED alert, prints diagnostic output through Serial Monitor, and stores structured sensor readings locally on a microSD card as a CSV file using the SPI interface.
+
+
+V7 has been completed. The system uses timer-driven sampling to read temperature and humidity data from a DHT11 sensor, updates a threshold-based GPIO alert, prints diagnostic output through Serial Monitor, and stores structured CSV sensor data locally on a microSD card. Each logged CSV record includes a checksum field to support basic data integrity verification.

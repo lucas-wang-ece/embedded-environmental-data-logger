@@ -76,7 +76,7 @@ void writeCsvHeaderIfNeeded() {
   }
 }
 
-byte calculateChecksum(String dataLine) {
+byte calculateChecksum(String dataLine) {     //checksum function
   byte checksum = 0;
 
   for (unsigned int i = 0; i < dataLine.length(); i++) {
