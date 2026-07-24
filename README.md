@@ -4,7 +4,7 @@ This project is an embedded firmware project built with an Arduino-compatible mi
 
 ## Project Goal
 
-The system will collect environmental sensor readings, output diagnostic logs through Serial/UART, trigger alerts based on sensor thresholds, and eventually store structured data locally as CSV files.
+The system will collect environmental sensor readings, output diagnostic logs through Serial/UART, trigger alerts based on sensor thresholds, and store structured data locally as CSV files on a microSD card
 
 ## Development Progress
 
