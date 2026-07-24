@@ -8,7 +8,7 @@
 #define DHT_TYPE DHT11
 #define SD_CS_PIN 10        // SD card chip select pin
 #define ALERT_LED_PIN 7
-#define TEMPERATURE_THRESHOLD_C 25.0
+#define TEMPERATURE_THRESHOLD_C 25
 
 DHT dht(DHT_PIN, DHT_TYPE);
 
